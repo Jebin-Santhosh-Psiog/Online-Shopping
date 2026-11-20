@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reset password | ShopNest</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/session.js"></script>
+  <script src="js/auth.js"></script>
+</head>
+<body>
+  <a href="index.html" class="alogo">Shop<span>Nest</span></a>
+  <div class="card auth">
+    <h2>Password assistance</h2>
+    <p>Enter the email linked to your account.</p>
+    <form id="reset" novalidate>
+      <label>Email</label>
+      <input id="email" type="email">
+      <small class="fe" id="e-email"></small>
+      <button class="btn y" id="btn">Send reset link</button>
+    </form>
+    <div id="msg"></div>
+    <div class="link"><a href="index.html">Back to sign in</a></div>
+  </div>
+</body>
+</html>
