@@ -37,15 +37,41 @@ function loadCats() {
   });
 }
 
-function getCart() {
+function cartDoc() {
   return db.get("carts", uid).then(
-    c => c.items || {},
-    e => e.status == 404 ? $.Deferred().resolve({}) : $.Deferred().reject(e)
+    c => ({ items: c.items || {}, coupon: c.coupon || "" }),
+    e => e.status == 404 ? $.Deferred().resolve({ items: {}, coupon: "" }) : $.Deferred().reject(e)
   );
 }
 
+function getCart() {
+  return cartDoc().then(d => d.items);
+}
+
 function saveCart(m) {
-  return db.set("carts", uid, { items: m, updatedAt: new Date() });
+  return db.merge("carts", uid, { items: m, updatedAt: new Date() });
+}
+
+function setCoupon(c) {
+  return db.merge("carts", uid, { coupon: c || null });
+}
+
+function r2(v) {
+  return Math.round(v * 100) / 100;
+}
+
+function checkCoupon(code, s) {
+  code = (code || "").trim().toUpperCase();
+  if (!/^[A-Z0-9]{4,15}$/.test(code)) return $.Deferred().reject(err("Invalid coupon code"));
+  return db.get("coupons", code).then(
+    c => {
+      if (!c.active || (c.exp && c.exp < new Date())) return $.Deferred().reject(err("Coupon " + code + " is expired or inactive"));
+      if (s < c.minAmt) return $.Deferred().reject(err("Add " + rupee(r2(c.minAmt - s)) + " more to use " + code + " (minimum order " + rupee(c.minAmt) + ")"));
+      let d = c.type == "pct" ? r2(s * c.val / 100) : c.val;
+      return { code: code, type: c.type, val: c.val, disc: Math.min(d, s) };
+    },
+    e => $.Deferred().reject(e.status == 404 ? err("Invalid coupon code") : e)
+  );
 }
 
 function count(m) {
