@@ -70,6 +70,10 @@ function fromDoc(d) {
   return o;
 }
 
+function docName(c, id) {
+  return "projects/" + PID + "/databases/(default)/documents/" + c + "/" + id;
+}
+
 function mask(o) {
   return Object.keys(o).map(k => "updateMask.fieldPaths=" + k).join("&");
 }
@@ -82,7 +86,7 @@ const db = {
   upd: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id + "?currentDocument.exists=true&" + mask(o), { fields: toFields(o) }).then(fromDoc),
   merge: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id + "?" + mask(o), { fields: toFields(o) }).then(fromDoc),
   many: (c, ids) => fsApi("POST", ":batchGet", {
-    documents: ids.map(i => "projects/" + PID + "/databases/(default)/documents/" + c + "/" + i)
+    documents: ids.map(i => docName(c, i))
   }).then(r => {
     let o = {};
     r.forEach(x => {
@@ -93,6 +97,7 @@ const db = {
     });
     return o;
   }),
+  commit: w => fsApi("POST", ":commit", { writes: w }),
   del: (c, id) => fsApi("DELETE", "/" + c + "/" + id),
   list: c => fsApi("GET", "/" + c + "?pageSize=300").then(r => (r.documents || []).map(fromDoc)),
   query: q => fsApi("POST", ":runQuery", { structuredQuery: q }).then(r => r.filter(x => x.document).map(x => fromDoc(x.document)))
