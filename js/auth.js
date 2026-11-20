@@ -2,7 +2,6 @@ const reName = /^[A-Za-z ]{3,30}$/;
 const reEm = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const reMob = /^[6-9]\d{9}$/;
 const rePw = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
-let t = "";
 
 function home() {
   let em = localStorage.getItem("em");
@@ -35,11 +34,10 @@ $(function () {
           name: nm, email: em, mob: mb, creditLimit: 0, creditUsed: 0, createdAt: new Date()
         });
       })
-      .then(() => authApi("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: localStorage.getItem("tok") }))
       .then(() => {
-        localStorage.clear();
-        msg("Account created! Verification mail sent to " + em + ". Redirecting to sign in...", true);
-        setTimeout(() => location.href = "index.html", 3000);
+        localStorage.setItem("name", nm);
+        msg("Account created! Taking you to the shop...", true);
+        setTimeout(() => location.href = "customer/shop.html", 1500);
       })
       .fail(e => msg(errText(e)))
       .always(() => busy(false));
@@ -55,33 +53,17 @@ $(function () {
     ];
     if (!v.every(x => x)) return;
     busy(true);
-    $("#resend").hide();
     authApi("signInWithPassword", { email: em, password: pw, returnSecureToken: true })
       .then(r => {
         save(r);
-        return authApi("lookup", { idToken: r.idToken });
-      })
-      .then(r => {
         if (em == ADMIN) return location.href = "admin/dashboard.html";
-        if (!r.users[0].emailVerified) {
-          t = localStorage.getItem("tok");
-          localStorage.clear();
-          $("#resend").show();
-          return $.Deferred().reject(err("EMAIL_NOT_VERIFIED"));
-        }
-        return db.get("customers", localStorage.getItem("uid")).then(c => {
+        return db.get("customers", r.localId).then(c => {
           localStorage.setItem("name", c.name || "Customer");
           location.href = "customer/shop.html";
         });
       })
       .fail(e => msg(errText(e)))
       .always(() => busy(false));
-  });
-
-  $("#resend").click(function () {
-    authApi("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: t })
-      .then(() => msg("Verification mail sent again", true))
-      .fail(e => msg(errText(e)));
   });
 
   $("#reset").submit(function (e) {
