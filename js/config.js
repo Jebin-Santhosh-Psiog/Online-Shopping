@@ -1,6 +1,7 @@
 const AUTH = "https://identitytoolkit.googleapis.com/v1/accounts:";
 const FS = "https://firestore.googleapis.com/v1/projects/" + PID + "/databases/(default)/documents";
 const ADMIN = "admin@shop.com";
+const MAXCREDIT = 1000;
 
 function authApi(a, d) {
   return $.ajax({
@@ -75,6 +76,7 @@ function mask(o) {
 
 const db = {
   add: (c, o) => fsApi("POST", "/" + c, { fields: toFields(o) }).then(fromDoc),
+  create: (c, id, o) => fsApi("POST", "/" + c + "?documentId=" + encodeURIComponent(id), { fields: toFields(o) }).then(fromDoc),
   set: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id, { fields: toFields(o) }).then(fromDoc),
   get: (c, id) => fsApi("GET", "/" + c + "/" + id).then(fromDoc),
   upd: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id + "?currentDocument.exists=true&" + mask(o), { fields: toFields(o) }).then(fromDoc),

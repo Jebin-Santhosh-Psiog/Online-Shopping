@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Coupons | ShopAdmin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="../js/env.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2 id="ttl">Add Coupon</h2>
+      <form id="frm" novalidate>
+        <div class="form2">
+          <div>
+            <label>Coupon code</label>
+            <input id="code" placeholder="SAVE10" maxlength="15">
+            <small class="fe" id="e-code"></small>
+          </div>
+          <div>
+            <label>Discount type</label>
+            <select id="type">
+              <option value="pct">Percentage (%)</option>
+              <option value="flat">Flat amount (&#8377;)</option>
+            </select>
+          </div>
+          <div>
+            <label id="vlabel">Discount (%)</label>
+            <input id="val" type="number" min="1">
+            <small class="fe" id="e-val"></small>
+          </div>
+          <div>
+            <label>Minimum order amount (&#8377;)</label>
+            <input id="min" type="number" min="0">
+            <small class="fe" id="e-min"></small>
+          </div>
+          <div>
+            <label>Expiry date (optional)</label>
+            <input id="exp" type="date">
+            <small class="fe" id="e-exp"></small>
+          </div>
+        </div>
+        <button class="btn" id="btn">Add</button>
+        <button type="button" class="btn grey" id="cancel" style="display:none">Cancel</button>
+      </form>
+      <div id="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Coupons</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Code</th><th>Discount</th><th>Min order</th><th>Expiry</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager">
+        <button class="btn grey sm" id="prev">Prev</button>
+        <span id="pg"></span>
+        <button class="btn grey sm" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/admin/coupons.js"></script>
+</body>
+</html>
