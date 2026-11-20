@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout | ShopNest</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/shop.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="../js/env.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h2>Checkout</h2>
+    <div class="cartpg">
+      <div class="cartl">
+        <div class="card">
+          <h3>1. Delivery address</h3>
+          <div class="form2">
+            <div>
+              <label>Name</label>
+              <input id="cname" readonly>
+            </div>
+            <div>
+              <label>Mobile</label>
+              <input id="cmob" readonly>
+            </div>
+            <div class="full">
+              <label>Address</label>
+              <textarea id="addr" rows="3" placeholder="House no, street, area, city"></textarea>
+              <small class="fe" id="e-addr"></small>
+            </div>
+            <div>
+              <label>Pincode</label>
+              <input id="pin" maxlength="6">
+              <small class="fe" id="e-pin"></small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>2. Payment method</h3>
+          <div id="pays"></div>
+          <small class="fe" id="e-pay"></small>
+        </div>
+
+        <div class="card">
+          <h3>3. Review items</h3>
+          <div id="lines">Loading...</div>
+        </div>
+      </div>
+
+      <div class="card sum" id="sum"></div>
+    </div>
+  </div>
+
+  <script src="../js/customer/common.js"></script>
+  <script src="../js/customer/checkout.js"></script>
+</body>
+</html>
