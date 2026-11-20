@@ -105,3 +105,10 @@ function ymd(d) {
 function dmy(d) {
   return d ? d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-";
 }
+
+const FALLBACK_IMG = "https://placehold.co/300x300?text=No+Image";
+
+document.addEventListener("error", function (e) {
+  let t = e.target;
+  if (t.tagName == "IMG" && t.src != FALLBACK_IMG) t.src = FALLBACK_IMG;
+}, true);

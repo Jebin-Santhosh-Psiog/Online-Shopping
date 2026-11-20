@@ -2,7 +2,8 @@ guard("admin");
 adminNav("inventory");
 
 const NOIMG = "https://placehold.co/300x300?text=No+Image";
-let n = 5, p = 1, eid = "", a = [], cats = {};
+const MAXW = 500, MAXB = 5 * 1024 * 1024, MAXLEN = 700000;
+let n = 5, p = 1, eid = "", a = [], cats = {}, imgData = "";
 
 function cname(id) {
   return cats[id] ? cats[id].name : "-";
@@ -57,8 +58,41 @@ function load() {
     .fail(e => msg(errText(e)));
 }
 
+function preview(u) {
+  $("#iprev").attr("src", u || NOIMG);
+  $("#clrimg").toggle(!!u);
+}
+
+function shrink(f) {
+  let d = $.Deferred();
+  if (!/^image\/(jpeg|png|webp|gif)$/.test(f.type)) return d.reject("Choose a JPG, PNG, WEBP or GIF image");
+  if (f.size > MAXB) return d.reject("Image must be smaller than 5 MB");
+  let r = new FileReader();
+  r.onload = () => {
+    let im = new Image();
+    im.onload = () => {
+      let k = Math.min(1, MAXW / Math.max(im.width, im.height));
+      let c = document.createElement("canvas");
+      c.width = Math.round(im.width * k);
+      c.height = Math.round(im.height * k);
+      let g = c.getContext("2d");
+      g.fillStyle = "#fff";
+      g.fillRect(0, 0, c.width, c.height);
+      g.drawImage(im, 0, 0, c.width, c.height);
+      d.resolve(c.toDataURL("image/jpeg", 0.8));
+    };
+    im.onerror = () => d.reject("Could not read this image");
+    im.src = r.result;
+  };
+  r.onerror = () => d.reject("Could not read this file");
+  r.readAsDataURL(f);
+  return d;
+}
+
 function reset() {
   eid = "";
+  imgData = "";
+  preview("");
   $("#frm")[0].reset();
   $("#idbox, #cancel").hide();
   $("#ttl").text("Add Item");
@@ -94,7 +128,7 @@ $("#frm").submit(function (e) {
     des: $("#des").val().trim(),
     qty: $("#qty").val().trim(),
     price: $("#price").val().trim(),
-    img: $("#img").val().trim()
+    img: imgData || $("#img").val().trim()
   };
   let v = [
     chk("cat", !!d.catId, "Select a category"),
@@ -102,7 +136,8 @@ $("#frm").submit(function (e) {
     chk("des", d.des.length >= 5 && d.des.length <= 300, "5 to 300 characters"),
     chk("qty", /^\d{1,5}$/.test(d.qty), "Whole number, 0 or more"),
     chk("price", /^\d{1,7}(\.\d{1,2})?$/.test(d.price) && +d.price > 0, "Amount above 0, max 2 decimals"),
-    chk("img", !d.img || /^https?:\/\/\S+$/.test(d.img), "Enter a valid http(s) URL")
+    chk("img", !d.img || (d.img.startsWith("data:image/") ? d.img.length < MAXLEN : /^https?:\/\/\S+$/.test(d.img)),
+      d.img.startsWith("data:image/") ? "Image is too large, choose a smaller one" : "Enter a valid http(s) image link")
   ];
   if (!v.every(x => x)) return;
   d.qty = +d.qty;
@@ -132,6 +167,39 @@ $("#frm").submit(function (e) {
 
 $("#cancel").click(reset);
 
+$("#file").change(function () {
+  let f = this.files[0], el = this;
+  if (!f) return;
+  shrink(f)
+    .then(u => {
+      imgData = u;
+      $("#img").val("");
+      $("#e-img").text("");
+      preview(u);
+    })
+    .fail(m => {
+      el.value = "";
+      $("#e-img").text(m);
+    });
+});
+
+$("#img").on("input", function () {
+  let u = this.value.trim();
+  if (u) {
+    imgData = "";
+    $("#file").val("");
+  }
+  preview(u || imgData);
+});
+
+$("#clrimg").click(function () {
+  imgData = "";
+  $("#file").val("");
+  $("#img").val("");
+  $("#e-img").text("");
+  preview("");
+});
+
 $("#rows").on("click", ".vw", function () {
   view(find($(this).data("id")));
 });
@@ -145,7 +213,10 @@ $("#rows").on("click", ".ed", function () {
   $("#des").val(x.des);
   $("#qty").val(x.qty);
   $("#price").val(x.price);
-  $("#img").val(x.img);
+  imgData = x.img && x.img.startsWith("data:image/") ? x.img : "";
+  $("#file").val("");
+  $("#img").val(imgData ? "" : (x.img || ""));
+  preview(x.img);
   $("#idbox, #cancel").show();
   $("#ttl").text("Edit Item");
   $("#btn").text("Update").data("t", "Update");
