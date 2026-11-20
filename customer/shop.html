@@ -10,33 +10,33 @@
   <script src="../js/session.js"></script>
 </head>
 <body>
-  <header class="top">
-    <a href="shop.html" class="brand">Shop<span>Nest</span></a>
-    <div class="search">
-      <select id="cat"><option value="">All</option></select>
-      <input id="q" placeholder="Search ShopNest">
-      <button id="go">&#128269;</button>
+  <div class="banner" id="banner" style="display:none">
+    <h1 id="btitle"></h1>
+    <p id="btext"></p>
+  </div>
+
+  <div class="sbar">
+    <div id="rtitle">Loading products...</div>
+    <div>
+      <label for="sort">Sort by</label>
+      <select id="sort">
+        <option value="">Featured</option>
+        <option value="lo">Price: Low to High</option>
+        <option value="hi">Price: High to Low</option>
+        <option value="new">Newest Arrivals</option>
+      </select>
     </div>
-    <div class="acc"><small>Hello, <span id="uname">User</span></small><b><a href="#" onclick="logout()">Sign out</a></b></div>
-    <a href="orders.html" class="acc"><small>Returns</small><b>&amp; Orders</b></a>
-    <a href="cart.html" class="cart">&#128722; <span id="cnt">0</span> Cart</a>
-  </header>
-
-  <div class="catbar" id="catbar"></div>
-
-  <div class="banner">
-    <h1>Flat 10% off</h1>
-    <p>Use code SAVE10 on orders above &#8377;500</p>
   </div>
 
   <div class="grid" id="grid"></div>
 
   <div class="pager">
     <button class="btn grey" id="prev">Prev</button>
-    <span id="pg">1</span>
+    <span id="pg"></span>
     <button class="btn grey" id="next">Next</button>
   </div>
 
+  <script src="../js/customer/common.js"></script>
   <script src="../js/customer/shop.js"></script>
 </body>
 </html>
