@@ -57,3 +57,28 @@
 .btn.o { background: #ffa41c; color: #111; border-radius: 20px; padding: 10px 30px; }
 .btn.o:hover { background: #fa8900; }
 #rel { margin-top: 10px; }
+
+.note { background: #fff7e6; border: 1px solid #f5c26b; padding: 10px 15px; border-radius: 6px; margin-bottom: 10px; font-size: 14px; }
+.cartpg { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.cartl { flex: 1 1 600px; }
+.sum { flex: 0 1 320px; position: sticky; top: 20px; }
+.cline { display: flex; gap: 18px; padding: 18px 0; border-bottom: 1px solid #e5e7eb; }
+.cline img { width: 120px; height: 120px; object-fit: contain; }
+.cline a { text-decoration: none; color: inherit; }
+.cinfo { flex: 1; }
+.cinfo h4 { font-size: 17px; font-weight: 500; }
+.cinfo a:hover h4 { color: #c45500; }
+.cact { margin-top: 10px; display: flex; gap: 15px; align-items: center; font-size: 14px; }
+.cact label { display: inline-block; margin: 0; }
+.cact select { width: auto; margin-left: 5px; padding: 5px; }
+.cact .rm { color: #007185; }
+.cprice { text-align: right; font-size: 18px; font-weight: 600; }
+.cprice small { display: block; font-size: 12px; font-weight: 400; color: #555; }
+.srow { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; font-size: 15px; }
+.srow.green { color: #16a34a; }
+.srow a { color: #007185; font-size: 13px; margin-left: 5px; }
+.srow.tot { border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 12px; font-size: 19px; font-weight: 600; }
+.cpn { display: flex; gap: 8px; margin-top: 8px; }
+.cpn .btn { margin-top: 0; }
+.sum .go { display: block; text-align: center; text-decoration: none; }
+.empty .btn { display: inline-block; width: auto; text-decoration: none; margin-top: 15px; padding: 10px 30px; }

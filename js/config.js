@@ -80,6 +80,19 @@ const db = {
   set: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id, { fields: toFields(o) }).then(fromDoc),
   get: (c, id) => fsApi("GET", "/" + c + "/" + id).then(fromDoc),
   upd: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id + "?currentDocument.exists=true&" + mask(o), { fields: toFields(o) }).then(fromDoc),
+  merge: (c, id, o) => fsApi("PATCH", "/" + c + "/" + id + "?" + mask(o), { fields: toFields(o) }).then(fromDoc),
+  many: (c, ids) => fsApi("POST", ":batchGet", {
+    documents: ids.map(i => "projects/" + PID + "/databases/(default)/documents/" + c + "/" + i)
+  }).then(r => {
+    let o = {};
+    r.forEach(x => {
+      if (x.found) {
+        let d = fromDoc(x.found);
+        o[d.id] = d;
+      }
+    });
+    return o;
+  }),
   del: (c, id) => fsApi("DELETE", "/" + c + "/" + id),
   list: c => fsApi("GET", "/" + c + "?pageSize=300").then(r => (r.documents || []).map(fromDoc)),
   query: q => fsApi("POST", ":runQuery", { structuredQuery: q }).then(r => r.filter(x => x.document).map(x => fromDoc(x.document)))
