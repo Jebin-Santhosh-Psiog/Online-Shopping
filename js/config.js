@@ -1,5 +1,3 @@
-const KEY = "AIzaSyATDsR4eipubQ-q6X3ArWmoEmhkWjy-9GU";
-const PID = "online-shopping-911f0";
 const AUTH = "https://identitytoolkit.googleapis.com/v1/accounts:";
 const FS = "https://firestore.googleapis.com/v1/projects/" + PID + "/databases/(default)/documents";
 const ADMIN = "admin@shop.com";
@@ -13,14 +11,28 @@ function authApi(a, d) {
   });
 }
 
-function fsApi(m, p, d) {
+function fresh() {
+  let e = +localStorage.getItem("exp");
+  if (!localStorage.getItem("rtok") || Date.now() < e - 60000) return $.Deferred().resolve();
   return $.ajax({
+    url: "https://securetoken.googleapis.com/v1/token?key=" + KEY,
+    method: "POST",
+    data: { grant_type: "refresh_token", refresh_token: localStorage.getItem("rtok") }
+  }).then(r => {
+    localStorage.setItem("tok", r.id_token);
+    localStorage.setItem("rtok", r.refresh_token);
+    localStorage.setItem("exp", Date.now() + r.expires_in * 1000);
+  });
+}
+
+function fsApi(m, p, d) {
+  return fresh().then(() => $.ajax({
     url: FS + p,
     method: m,
     contentType: "application/json",
     headers: { Authorization: "Bearer " + localStorage.getItem("tok") },
     data: d ? JSON.stringify(d) : undefined
-  });
+  }));
 }
 
 function toF(v) {

@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.email == "admin@shop.com";
+    }
+
+    function isMe(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function onlyChanged(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    match /categories/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /coupons/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /inventory/{id} {
+      allow read: if signedIn();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (signedIn() && onlyChanged(["qty"])
+            && request.resource.data.qty >= 0
+            && request.resource.data.qty < resource.data.qty);
+    }
+
+    match /customers/{uid} {
+      allow read: if isMe(uid) || isAdmin();
+      allow create: if isMe(uid)
+        && request.resource.data.creditLimit == 0
+        && request.resource.data.creditUsed == 0;
+      allow update: if isAdmin()
+        || (isMe(uid) && onlyChanged(["name", "mob"]))
+        || (isMe(uid) && onlyChanged(["creditUsed"])
+            && request.resource.data.creditUsed > resource.data.creditUsed
+            && request.resource.data.creditUsed <= resource.data.creditLimit);
+      allow delete: if isAdmin();
+    }
+
+    match /carts/{uid} {
+      allow read, write: if isMe(uid);
+    }
+
+    match /orders/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+  }
+}

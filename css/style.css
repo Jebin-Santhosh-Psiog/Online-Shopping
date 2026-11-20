@@ -35,3 +35,12 @@ th { background: #f1f5f9; }
 .btn.y { background: #ffd814; color: #111; width: 100%; border-radius: 20px; }
 .btn.y:hover { background: #f7ca00; }
 .fe { color: #dc2626; font-size: 12px; }
+
+.row { display: flex; gap: 15px; align-items: flex-end; }
+.row > div { flex: 1; }
+.row > div.fit { flex: 0; }
+.tag { padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+.tag.on { background: #dcfce7; color: #166534; }
+.tag.off { background: #fee2e2; color: #991b1b; }
+#modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9; }
+#modal .card { max-width: 360px; margin: 150px auto; text-align: center; }

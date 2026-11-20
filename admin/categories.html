@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Categories | ShopAdmin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="../js/env.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2 id="ttl">Add Category</h2>
+      <form id="frm" novalidate>
+        <div class="row">
+          <div id="idbox" style="display:none">
+            <label>Id</label>
+            <input id="cid" readonly>
+          </div>
+          <div>
+            <label>Category name</label>
+            <input id="name">
+          </div>
+          <div class="fit"><button class="btn" id="btn">Add</button></div>
+          <div class="fit"><button type="button" class="btn grey" id="cancel" style="display:none">Cancel</button></div>
+        </div>
+        <small class="fe" id="e-name"></small>
+      </form>
+      <div id="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Categories</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Id</th><th>Name</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager">
+        <button class="btn grey sm" id="prev">Prev</button>
+        <span id="pg"></span>
+        <button class="btn grey sm" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/admin/categories.js"></script>
+</body>
+</html>

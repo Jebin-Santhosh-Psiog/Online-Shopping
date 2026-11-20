@@ -1,0 +1,65 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  check-html-titles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check all HTML files have title tags
+        run: |
+          for file in $(find . -name "*.html" -size +0 -not -path "./.git/*"); do
+            if ! grep -q "<title>" "$file"; then
+              echo "ERROR: $file is missing <title> tag"
+              exit 1
+            fi
+          done
+          echo "All HTML files have title tags"
+
+  check-image-alt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check images have alt attributes
+        run: |
+          MISSING=$(grep -rn '<img' --include=*.html --include=*.js . | grep -v 'alt=' || true)
+          if [ -n "$MISSING" ]; then
+            echo "ERROR: Images missing alt attributes:"
+            echo "$MISSING"
+            exit 1
+          fi
+          echo "All images have alt attributes"
+
+  check-no-console-log:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for console.log in JS
+        run: |
+          if grep -rn "console.log" js/; then
+            echo "WARNING: Remove console.log before merging"
+            exit 1
+          fi
+          echo "No console.log found"
+
+  check-no-sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make sure Firebase SDK is not used (REST API only)
+        run: |
+          if grep -rn "firebasejs\|firebase.initializeApp\|firebase.firestore()\|firebase.auth()" --include=*.html --include=*.js .; then
+            echo "ERROR: Firebase SDK found. Use the REST API only."
+            exit 1
+          fi
+          echo "No Firebase SDK usage found"
+
+  all-checks-passed:
+    runs-on: ubuntu-latest
+    needs: [check-html-titles, check-image-alt, check-no-console-log, check-no-sdk]
+    steps:
+      - name: All checks passed
+        run: echo "All PR checks passed! Ready for review."
