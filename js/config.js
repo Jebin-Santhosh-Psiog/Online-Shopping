@@ -97,6 +97,16 @@ const db = {
     });
     return o;
   }),
+  agg: (q, a) => fsApi("POST", ":runAggregationQuery", {
+    structuredAggregationQuery: {
+      structuredQuery: q,
+      aggregations: Object.keys(a).map(k => Object.assign({ alias: k }, a[k]))
+    }
+  }).then(r => {
+    let f = (r[0] && r[0].result && r[0].result.aggregateFields) || {}, o = {};
+    for (let k in a) o[k] = f[k] ? fromF(f[k]) : 0;
+    return o;
+  }),
   commit: w => fsApi("POST", ":commit", { writes: w }),
   del: (c, id) => fsApi("DELETE", "/" + c + "/" + id),
   list: c => fsApi("GET", "/" + c + "?pageSize=300").then(r => (r.documents || []).map(fromDoc)),

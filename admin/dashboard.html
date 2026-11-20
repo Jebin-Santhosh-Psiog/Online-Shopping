@@ -12,13 +12,19 @@
   <div class="wrap">
     <div class="card">
       <h2>Welcome, Admin</h2>
-      <p>Select a section from the menu.</p>
+      <p>Store overview, updated live from Firestore.</p>
+      <div class="kpis" id="kpis">Loading...</div>
+      <div id="msg"></div>
+    </div>
+    <div class="card">
+      <h2>Quick links</h2>
+      <a href="inventory.html" class="btn">Add item</a>
+      <a href="customers.html" class="btn grey">Set credit limits</a>
+      <a href="coupons.html" class="btn grey">Manage coupons</a>
+      <a href="reports.html" class="btn grey">View reports</a>
     </div>
   </div>
 
-  <script>
-    guard("admin");
-    adminNav("dashboard");
-  </script>
+  <script src="../js/admin/dashboard.js"></script>
 </body>
 </html>
