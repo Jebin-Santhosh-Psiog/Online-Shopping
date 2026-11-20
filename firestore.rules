@@ -43,7 +43,7 @@ service cloud.firestore {
         && request.resource.data.creditLimit == 0
         && request.resource.data.creditUsed == 0;
       allow update: if isAdmin()
-        || (isMe(uid) && onlyChanged(["name", "mob"]))
+        || (isMe(uid) && onlyChanged(["name", "mob", "address", "pin"]))
         || (isMe(uid) && onlyChanged(["creditUsed"])
             && request.resource.data.creditUsed > resource.data.creditUsed
             && request.resource.data.creditUsed <= resource.data.creditLimit);

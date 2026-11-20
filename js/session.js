@@ -40,7 +40,9 @@ function err(m) {
 }
 
 function errText(e) {
-  let r = e.responseJSON;
+  if (e instanceof Error) return "Script error: " + e.message + ". Check that all project files are up to date.";
+  if (e && e.status === 0) return "Network error, check your connection";
+  let r = e && e.responseJSON;
   if (Array.isArray(r)) r = r[0];
   let m = r ? (r.error.message || r.error) : "Network error, check your connection";
   let map = {
@@ -85,4 +87,21 @@ function adminNav(a) {
         <a href="#" onclick="logout()">Logout</a>
       </div>
     </nav>`);
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function rupee(v) {
+  return "₹" + Number(v).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function ymd(d) {
+  let p = x => String(x).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+
+function dmy(d) {
+  return d ? d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "-";
 }

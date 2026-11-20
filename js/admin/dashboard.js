@@ -4,35 +4,57 @@ adminNav("dashboard");
 const LOW = 15;
 let now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
 
+const K = [
+  { id: "cat", t: "Categories", link: "categories.html" },
+  { id: "inv", t: "Products", link: "inventory.html" },
+  { id: "low", t: "Low stock items (under " + LOW + ")", link: "reports.html" },
+  { id: "cus", t: "Customers", link: "customers.html" },
+  { id: "cr", t: "Credit outstanding", link: "customers.html" },
+  { id: "ord", t: "Orders this month", link: "reports.html" },
+  { id: "sal", t: "Sales this month", link: "reports.html" }
+];
+
 function q(c, w) {
   let o = { from: [{ collectionId: c }] };
   if (w) o.where = w;
   return o;
 }
 
-function kpi(t, v, link) {
-  return `<a class="kpi" href="${link}"><small>${t}</small><b>${v}</b></a>`;
+function set(id, v) {
+  $("#k-" + id).text(v);
 }
 
-$.when(
-  db.agg(q("categories"), { n: { count: {} } }),
-  db.agg(q("inventory"), { n: { count: {} } }),
-  db.agg(q("inventory", where("qty", "LESS_THAN", LOW)), { n: { count: {} } }),
-  db.agg(q("customers"), { n: { count: {} }, s: { sum: { field: { fieldPath: "creditUsed" } } } }),
-  db.agg(q("orders", where("createdAt", "GREATER_THAN_OR_EQUAL", first)), { n: { count: {} }, s: { sum: { field: { fieldPath: "total" } } } })
-)
-  .then((c, i, l, cu, o) => {
-    $("#kpis").html(
-      kpi("Categories", c.n, "categories.html") +
-      kpi("Products", i.n, "inventory.html") +
-      kpi("Low stock items (under " + LOW + ")", l.n, "reports.html") +
-      kpi("Customers", cu.n, "customers.html") +
-      kpi("Credit outstanding", rupee(cu.s), "customers.html") +
-      kpi("Orders this month", o.n, "reports.html") +
-      kpi("Sales this month", rupee(o.s), "reports.html")
-    );
-  })
-  .fail(e => {
-    $("#kpis").text("");
+function fail(ids) {
+  return e => {
+    ids.forEach(id => set(id, "-"));
     msg(errText(e));
-  });
+  };
+}
+
+$("#kpis").html(K.map(k => `<a class="kpi" href="${k.link}"><small>${k.t}</small><b id="k-${k.id}">...</b></a>`).join(""));
+
+db.agg(q("categories"), { n: { count: {} } })
+  .then(r => set("cat", r.n))
+  .fail(fail(["cat"]));
+
+db.agg(q("inventory"), { n: { count: {} } })
+  .then(r => set("inv", r.n))
+  .fail(fail(["inv"]));
+
+db.agg(q("inventory", where("qty", "LESS_THAN", LOW)), { n: { count: {} } })
+  .then(r => set("low", r.n))
+  .fail(fail(["low"]));
+
+db.agg(q("customers"), { n: { count: {} }, s: { sum: { field: { fieldPath: "creditUsed" } } } })
+  .then(r => {
+    set("cus", r.n);
+    set("cr", rupee(r.s));
+  })
+  .fail(fail(["cus", "cr"]));
+
+db.query(q("orders", where("createdAt", "GREATER_THAN_OR_EQUAL", first)))
+  .then(r => {
+    set("ord", r.length);
+    set("sal", rupee(Math.round(r.reduce((s, o) => s + o.total, 0) * 100) / 100));
+  })
+  .fail(fail(["ord", "sal"]));

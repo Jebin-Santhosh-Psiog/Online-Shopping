@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inventory | ShopAdmin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="../js/env.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h2 id="ttl">Add Item</h2>
+      <form id="frm" novalidate>
+        <div class="form2">
+          <div id="idbox" class="full" style="display:none">
+            <label>Id</label>
+            <input id="iid" readonly>
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="cat"></select>
+            <small class="fe" id="e-cat"></small>
+          </div>
+          <div>
+            <label>Title</label>
+            <input id="title">
+            <small class="fe" id="e-title"></small>
+          </div>
+          <div class="full">
+            <label>Description</label>
+            <textarea id="des" rows="3"></textarea>
+            <small class="fe" id="e-des"></small>
+          </div>
+          <div>
+            <label>Quantity</label>
+            <input id="qty" type="number" min="0">
+            <small class="fe" id="e-qty"></small>
+          </div>
+          <div>
+            <label>Price (&#8377;)</label>
+            <input id="price" type="number" min="0" step="0.01">
+            <small class="fe" id="e-price"></small>
+          </div>
+          <div class="full">
+            <label>Image URL (optional)</label>
+            <input id="img" placeholder="https://...">
+            <small class="fe" id="e-img"></small>
+          </div>
+        </div>
+        <button class="btn" id="btn">Add</button>
+        <button type="button" class="btn grey" id="cancel" style="display:none">Cancel</button>
+      </form>
+      <div id="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Inventory</h2>
+      <div class="filters">
+        <div>
+          <label>Filter by category</label>
+          <select id="fcat"><option value="">All categories</option></select>
+        </div>
+        <div>
+          <label>Find item by Id</label>
+          <input id="fid" placeholder="Paste item Id">
+        </div>
+        <button class="btn grey" id="find">Find</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Image</th><th>Title</th><th>Category</th><th>Qty</th><th>Price</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager">
+        <button class="btn grey sm" id="prev">Prev</button>
+        <span id="pg"></span>
+        <button class="btn grey sm" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="view">
+    <div class="card">
+      <div id="vbody"></div>
+      <button class="btn grey" id="vclose">Close</button>
+    </div>
+  </div>
+
+  <script src="../js/admin/inventory.js"></script>
+</body>
+</html>

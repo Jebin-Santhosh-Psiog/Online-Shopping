@@ -27,6 +27,7 @@ jobs:
         run: |
           echo "const KEY = \"${{ secrets.FIREBASE_API_KEY }}\";" > js/env.js
           echo "const PID = \"${{ secrets.FIREBASE_PROJECT_ID }}\";" >> js/env.js
+          echo "const EJS = { service: \"${{ secrets.EMAILJS_SERVICE_ID }}\", template: \"${{ secrets.EMAILJS_TEMPLATE_ID }}\", key: \"${{ secrets.EMAILJS_PUBLIC_KEY }}\" };" >> js/env.js
 
       - name: Remove dev-only files
         run: rm -rf test.html .github .htmlhintrc
