@@ -44,8 +44,16 @@
             <small class="fe" id="e-price"></small>
           </div>
           <div class="full">
-            <label>Image URL (optional)</label>
-            <input id="img" placeholder="https://...">
+            <label for="file">Product image (optional)</label>
+            <div class="imgpick">
+              <img id="iprev" class="iprev" src="https://placehold.co/300x300?text=No+Image" alt="Image preview">
+              <div>
+                <input type="file" id="file" accept="image/jpeg,image/png,image/webp,image/gif">
+                <small class="hint">Upload from your computer (JPG, PNG, WEBP or GIF, max 5 MB), or paste an image link</small>
+                <input id="img" placeholder="https://.../image.jpg">
+                <button type="button" class="btn grey sm" id="clrimg" style="display:none">Remove image</button>
+              </div>
+            </div>
             <small class="fe" id="e-img"></small>
           </div>
         </div>
