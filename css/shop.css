@@ -113,3 +113,15 @@
   body { background: #fff; }
   .bill { box-shadow: none; }
 }
+
+.credit { background: #fff; border-radius: 8px; padding: 12px 18px; margin-bottom: 15px; font-size: 14px; }
+.ord { padding: 0; overflow: hidden; }
+.ohead { display: flex; gap: 30px; flex-wrap: wrap; background: #f0f2f2; padding: 12px 20px; font-size: 13px; }
+.ohead small { display: block; color: #565959; }
+.ohead .oid { margin-left: auto; text-align: right; }
+.ohead a { color: #007185; }
+.obody { padding: 15px 20px; }
+.oitem { display: flex; gap: 15px; padding: 8px 0; border-bottom: 1px solid #f1f1f1; }
+.oitem a { flex: 1; color: #007185; text-decoration: none; }
+.oitem span { color: #555; }
+.tag.cp { background: #e0f2fe; color: #075985; margin-left: 5px; }

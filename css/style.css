@@ -44,3 +44,29 @@ th { background: #f1f5f9; }
 .tag.off { background: #fee2e2; color: #991b1b; }
 #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9; }
 #modal .card { max-width: 360px; margin: 150px auto; text-align: center; }
+.form2 { display: flex; flex-wrap: wrap; gap: 0 20px; }
+.form2 > div { flex: 1 1 45%; }
+.form2 > div.full { flex: 1 1 100%; }
+.filters { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.filters > div { flex: 0 1 220px; }
+.thumb { width: 50px; height: 50px; object-fit: contain; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9; overflow-y: auto; }
+.modal .card { max-width: 440px; margin: 80px auto; }
+.modal .big { width: 100%; height: 220px; object-fit: contain; }
+.modal td { padding: 6px 10px; }
+
+.kpis { display: flex; flex-wrap: wrap; gap: 15px; margin: 15px 0; }
+.kpi { flex: 1 1 160px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; color: inherit; text-decoration: none; }
+a.kpi:hover { border-color: #2563eb; }
+.kpi small { display: block; color: #64748b; margin-bottom: 4px; }
+.kpi b { font-size: 22px; }
+.rhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; flex-wrap: wrap; }
+.rhead small { color: #64748b; }
+.filters > div.wide { flex: 1 1 320px; }
+.card > a.btn { display: inline-block; text-decoration: none; margin-right: 6px; }
+
+@media print {
+  nav, .noprint { display: none; }
+  body { background: #fff; }
+  .card { box-shadow: none; }
+}
