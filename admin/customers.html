@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customers | ShopAdmin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="../js/env.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/session.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="edit" style="display:none">
+      <h2>Credit Limit</h2>
+      <form id="frm" novalidate>
+        <div class="form2">
+          <div>
+            <label>Customer</label>
+            <input id="cname" readonly>
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="cemail" readonly>
+          </div>
+          <div>
+            <label>Credit used (&#8377;)</label>
+            <input id="cused" readonly>
+          </div>
+          <div>
+            <label>Credit limit (&#8377;, max 1000)</label>
+            <input id="limit" type="number" min="0" max="1000">
+            <small class="fe" id="e-limit"></small>
+          </div>
+        </div>
+        <button class="btn" id="btn">Save</button>
+        <button type="button" class="btn grey" id="cancel">Cancel</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Customers</h2>
+      <div class="filters">
+        <div>
+          <label>Find by email</label>
+          <input id="femail" placeholder="customer@gmail.com">
+        </div>
+        <button class="btn grey" id="find">Find</button>
+        <button class="btn grey" id="all">Show all</button>
+      </div>
+      <div id="msg"></div>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Email</th><th>Mobile</th><th>Limit</th><th>Used</th><th>Available</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager">
+        <button class="btn grey sm" id="prev">Prev</button>
+        <span id="pg"></span>
+        <button class="btn grey sm" id="next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="view">
+    <div class="card">
+      <div id="vbody"></div>
+      <button class="btn grey" id="vclose">Close</button>
+    </div>
+  </div>
+
+  <script src="../js/admin/customers.js"></script>
+</body>
+</html>
