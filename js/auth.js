@@ -6,40 +6,9 @@ let t = "";
 
 function home() {
   let em = localStorage.getItem("em");
-  if (em) location.href = em == ADMIN ? "/admin/dashboard.html" : "/customer/shop.html";
+  if (em) location.href = em == ADMIN ? "admin/dashboard.html" : "customer/shop.html";
 }
 home();
-
-function chk(id, ok, m) {
-  $("#e-" + id).text(ok ? "" : m);
-  return ok;
-}
-
-function busy(b) {
-  let x = $("#btn");
-  if (!x.data("t")) x.data("t", x.text());
-  x.prop("disabled", b).text(b ? "Please wait..." : x.data("t"));
-}
-
-function err(m) {
-  return { responseJSON: { error: { message: m } } };
-}
-
-function errText(e) {
-  let r = e.responseJSON;
-  let m = r ? (r.error.message || r.error) : "Network error, check your connection";
-  let map = {
-    EMAIL_EXISTS: "This email is already registered",
-    INVALID_LOGIN_CREDENTIALS: "Invalid email or password",
-    EMAIL_NOT_FOUND: "Email not registered",
-    INVALID_PASSWORD: "Wrong password",
-    USER_DISABLED: "This account is disabled",
-    INVALID_EMAIL: "Invalid email",
-    TOO_MANY_ATTEMPTS_TRY_LATER: "Too many attempts, try again later",
-    EMAIL_NOT_VERIFIED: "Please verify your email first. Check your inbox/spam"
-  };
-  return map[m.split(" ")[0]] || m;
-}
 
 $(function () {
 
@@ -62,8 +31,8 @@ $(function () {
     authApi("signUp", { email: em, password: pw, returnSecureToken: true })
       .then(r => {
         save(r);
-        return dbApi("PUT", "customers/" + r.localId, {
-          name: nm, email: em, mob: mb, creditLimit: 0, creditUsed: 0, createdAt: Date.now()
+        return db.set("customers", r.localId, {
+          name: nm, email: em, mob: mb, creditLimit: 0, creditUsed: 0, createdAt: new Date()
         });
       })
       .then(() => authApi("sendOobCode", { requestType: "VERIFY_EMAIL", idToken: localStorage.getItem("tok") }))
@@ -100,8 +69,8 @@ $(function () {
           $("#resend").show();
           return $.Deferred().reject(err("EMAIL_NOT_VERIFIED"));
         }
-        return dbApi("GET", "customers/" + localStorage.getItem("uid")).then(c => {
-          localStorage.setItem("name", c ? c.name : "Customer");
+        return db.get("customers", localStorage.getItem("uid")).then(c => {
+          localStorage.setItem("name", c.name || "Customer");
           location.href = "customer/shop.html";
         });
       })

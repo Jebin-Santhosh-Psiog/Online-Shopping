@@ -3,12 +3,16 @@
 <head>
   <title>Test</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/env.js"></script>
   <script src="js/config.js"></script>
 </head>
 <body>
   <input id="em" placeholder="email">
   <input id="pw" type="password" placeholder="password">
   <button id="go">Test</button>
+  <h3>Raw Firestore response</h3>
+  <pre id="raw"></pre>
+  <h3>Converted to plain JSON</h3>
   <pre id="out"></pre>
 
   <script>
@@ -20,16 +24,19 @@
       })
       .then(function (r) {
         localStorage.setItem("tok", r.idToken);
-        return dbApi("POST", "categories", { name: "Electronics", active: true });
+        return fsApi("POST", "/categories", {
+          fields: { name: { stringValue: "Electronics" }, active: { booleanValue: true } }
+        });
       })
       .then(function () {
-        return dbApi("GET", "categories");
+        return fsApi("GET", "/categories");
       })
       .then(function (r) {
-        $("#out").text(JSON.stringify(r, null, 2));
+        $("#raw").text(JSON.stringify(r, null, 2));
+        $("#out").text(JSON.stringify(r.documents.map(fromDoc), null, 2));
       })
       .fail(function (e) {
-        $("#out").text(JSON.stringify(e.responseJSON, null, 2));
+        $("#raw").text(JSON.stringify(e.responseJSON, null, 2));
       });
     });
   </script>

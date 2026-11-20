@@ -1,0 +1,37 @@
+name: Validate HTML, CSS & JS
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install validation tools
+        run: |
+          npm install -g htmlhint
+          npm install -g csslint
+
+      - name: Validate HTML files
+        run: find . -name "*.html" -size +0 -not -path "./.git/*" | xargs htmlhint --config .htmlhintrc
+
+      - name: Validate CSS files
+        run: csslint css/style.css css/shop.css --quiet --ignore=known-properties,order-alphabetical,universal-selector,box-sizing,compatible-vendor-prefixes,fallback-colors,adjoining-classes,box-model,qualified-headings,unique-headings,important,font-sizes,ids,overqualified-elements
+
+      - name: Check JavaScript syntax
+        run: |
+          for f in $(find js -name "*.js"); do
+            node --check "$f"
+          done
+          echo "All JS files are valid"

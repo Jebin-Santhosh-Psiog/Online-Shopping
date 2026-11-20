@@ -15,7 +15,7 @@ function render() {
   let a = list.slice((p - 1) * n, p * n);
   $("#grid").html(a.map(x => `
     <div class="item">
-      <img src="${x.img}">
+      <img src="${x.img}" alt="${x.title}">
       <h4>${x.title}</h4>
       <div class="price">&#8377;${x.price.toLocaleString("en-IN")}</div>
       <div class="stock ${x.qty ? "" : "no"}">${x.qty ? "In stock" : "Out of stock"}</div>
