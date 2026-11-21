@@ -74,6 +74,19 @@ function docName(c, id) {
   return "projects/" + PID + "/databases/(default)/documents/" + c + "/" + id;
 }
 
+function newId() {
+  let c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", s = "";
+  for (let i = 0; i < 20; i++) s += c[Math.floor(Math.random() * c.length)];
+  return s;
+}
+
+function listAll(c, t, acc) {
+  return fsApi("GET", "/" + c + "?pageSize=300" + (t ? "&pageToken=" + encodeURIComponent(t) : "")).then(r => {
+    acc = acc.concat((r.documents || []).map(fromDoc));
+    return r.nextPageToken ? listAll(c, r.nextPageToken, acc) : acc;
+  });
+}
+
 function mask(o) {
   return Object.keys(o).map(k => "updateMask.fieldPaths=" + k).join("&");
 }
@@ -109,7 +122,7 @@ const db = {
   }),
   commit: w => fsApi("POST", ":commit", { writes: w }),
   del: (c, id) => fsApi("DELETE", "/" + c + "/" + id),
-  list: c => fsApi("GET", "/" + c + "?pageSize=300").then(r => (r.documents || []).map(fromDoc)),
+  list: c => listAll(c, "", []),
   query: q => fsApi("POST", ":runQuery", { structuredQuery: q }).then(r => r.filter(x => x.document).map(x => fromDoc(x.document)))
 };
 
