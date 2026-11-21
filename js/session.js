@@ -44,7 +44,7 @@ function errText(e) {
   if (e && e.status === 0) return "Network error, check your connection";
   let r = e && e.responseJSON;
   if (Array.isArray(r)) r = r[0];
-  let m = r ? (r.error.message || r.error) : "Network error, check your connection";
+  let m = r ? String((r.error && (r.error.message || r.error)) || r.message || "Request failed") : "Network error, check your connection";
   let map = {
     EMAIL_EXISTS: "This email is already registered",
     INVALID_LOGIN_CREDENTIALS: "Invalid email or password",
