@@ -75,3 +75,11 @@ a.kpi:hover { border-color: #2563eb; }
 .imgpick > div { flex: 1; }
 .iprev { width: 110px; height: 110px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; }
 .hint { display: block; margin: 8px 0 4px; color: #64748b; font-size: 12px; }
+
+.modal .card.wide { max-width: 640px; }
+.clist { display: flex; flex-wrap: wrap; max-height: 260px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; margin: 8px 0 12px; }
+.chk { display: flex; align-items: center; gap: 6px; margin: 4px 0; flex: 1 1 33%; font-size: 14px; cursor: pointer; }
+.chk input { width: auto; }
+.ilog { margin-top: 12px; font-size: 13px; max-height: 160px; overflow-y: auto; line-height: 1.7; }
+.ilog .err { color: #dc2626; }
+.rhead .btn { margin-top: 0; }

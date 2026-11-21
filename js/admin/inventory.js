@@ -3,7 +3,7 @@ adminNav("inventory");
 
 const NOIMG = "https://placehold.co/300x300?text=No+Image";
 const MAXW = 500, MAXB = 5 * 1024 * 1024, MAXLEN = 700000;
-let n = 5, p = 1, eid = "", a = [], cats = {}, imgData = "";
+let n = 10, p = 1, eid = "", a = [], cats = {}, imgData = "";
 
 function cname(id) {
   return cats[id] ? cats[id].name : "-";
@@ -259,6 +259,119 @@ $("#find").click(function () {
 });
 
 $("#vclose").click(() => $("#view").hide());
+
+const DJ = "https://dummyjson.com/products";
+
+function pretty(s) {
+  return s.split("-").map(w => w[0].toUpperCase() + w.slice(1)).join(" ");
+}
+
+function ilog(t, bad) {
+  $("#ilog").append(`<div class="${bad ? "err" : ""}">${esc(t)}</div>`);
+  $("#ilog").scrollTop(1e6);
+}
+
+function catFor(slug) {
+  let nm = pretty(slug), k = nm.toLowerCase();
+  let c = Object.values(cats).find(x => (x.key || x.name.toLowerCase()) == k);
+  if (c) return $.Deferred().resolve(c.id);
+  return db.add("categories", { name: nm, key: k, active: true, createdAt: new Date() }).then(x => {
+    cats[x.id] = x;
+    return x.id;
+  });
+}
+
+function importCat(slug, rate, have) {
+  return $.ajax({ url: DJ + "/category/" + encodeURIComponent(slug) + "?limit=0" }).then(r => {
+    let ps = (r.products || []).filter(x => String(x.title || "").trim().length >= 2);
+    if (!ps.length) return { n: 0, s: 0 };
+    return catFor(slug).then(cid => {
+      let w = [], sk = 0;
+      ps.forEach(x => {
+        let t = String(x.title).trim().replace(/\s+/g, " ").slice(0, 60), k = t.toLowerCase();
+        if (have[cid + "|" + k]) { sk++; return; }
+        have[cid + "|" + k] = 1;
+        let d = {
+          catId: cid,
+          title: t,
+          key: k,
+          des: String(x.description || t).trim().slice(0, 300),
+          qty: Math.max(0, parseInt(x.stock, 10) || 0),
+          price: Math.max(1, Math.round((+x.price || 0) * rate)),
+          img: (x.images && x.images[0]) || x.thumbnail || "",
+          active: true,
+          src: "dummyjson",
+          createdAt: new Date()
+        };
+        w.push({ update: { name: docName("inventory", newId()), fields: toFields(d) }, currentDocument: { exists: false } });
+      });
+      return (w.length ? db.commit(w) : $.Deferred().resolve()).then(() => ({ n: w.length, s: sk }));
+    });
+  });
+}
+
+function runAll(list, rate, have, tot) {
+  if (!list.length) return $.Deferred().resolve(tot);
+  let s = list[0];
+  ilog("Importing " + pretty(s) + "...");
+  return importCat(s, rate, have)
+    .then(
+      r => {
+        $("#ilog div:last").text(pretty(s) + ": " + r.n + " added, " + r.s + " skipped");
+        tot.n += r.n;
+        tot.s += r.s;
+      },
+      e => {
+        $("#ilog div:last").text(pretty(s) + ": failed. " + errText(e)).addClass("err");
+        tot.f++;
+        return $.Deferred().resolve();
+      }
+    )
+    .then(() => runAll(list.slice(1), rate, have, tot));
+}
+
+$("#iopen").click(function () {
+  $("#imp").show();
+  if ($("#ilist input").length) return;
+  $("#ilist").text("Loading categories from DummyJSON...");
+  $.ajax({ url: DJ + "/category-list" })
+    .then(r => {
+      $("#ilist").html(r.map(s => `<label class="chk"><input type="checkbox" value="${esc(s)}"> ${esc(pretty(s))}</label>`).join(""));
+    })
+    .fail(() => $("#ilist").text("Could not reach DummyJSON. Check your internet connection and try again."));
+});
+
+$("#iall").change(function () {
+  $("#ilist input").prop("checked", this.checked);
+});
+
+$("#iclose").click(() => $("#imp").hide());
+
+$("#irun").click(function () {
+  let sel = $("#ilist input:checked").map((i, x) => x.value).get();
+  let rate = +$("#irate").val();
+  $("#ilog").html("");
+  if (!sel.length) return ilog("Select at least one category", true);
+  if (!(rate >= 1 && rate <= 500)) return ilog("Enter a conversion rate from 1 to 500", true);
+  let b = $(this).prop("disabled", true).text("Importing...");
+  $("#iclose").prop("disabled", true);
+  db.list("inventory")
+    .then(r => {
+      let h = {};
+      r.forEach(x => h[x.catId + "|" + (x.key || x.title.toLowerCase())] = 1);
+      return runAll(sel, rate, h, { n: 0, s: 0, f: 0 });
+    })
+    .then(t => {
+      ilog("Done: " + t.n + " products added, " + t.s + " skipped" + (t.f ? ", " + t.f + " categories failed" : "") + ".");
+      return loadCats();
+    })
+    .then(() => { p = 1; load(); })
+    .fail(e => ilog(errText(e), true))
+    .always(() => {
+      b.prop("disabled", false).text("Import selected");
+      $("#iclose").prop("disabled", false);
+    });
+});
 
 $("#prev").click(() => { p--; load(); });
 $("#next").click(() => { p++; load(); });

@@ -64,7 +64,10 @@
     </div>
 
     <div class="card">
-      <h2>Inventory</h2>
+      <div class="rhead">
+        <h2>Inventory</h2>
+        <button class="btn grey" id="iopen">Import sample products</button>
+      </div>
       <div class="filters">
         <div>
           <label>Filter by category</label>
@@ -94,6 +97,20 @@
     <div class="card">
       <div id="vbody"></div>
       <button class="btn grey" id="vclose">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="imp">
+    <div class="card wide">
+      <h3>Import sample products</h3>
+      <p class="hint">Products with images, descriptions, prices and stock come from the free DummyJSON API and are saved into your Firestore. Titles that already exist in the same category are skipped.</p>
+      <label class="chk"><input type="checkbox" id="iall"> Select all categories</label>
+      <div id="ilist" class="clist"></div>
+      <label for="irate">Price conversion (&#8377; per 1 US $)</label>
+      <input id="irate" type="number" value="85" min="1" max="500">
+      <div id="ilog" class="ilog"></div>
+      <button class="btn" id="irun">Import selected</button>
+      <button class="btn grey" id="iclose">Close</button>
     </div>
   </div>
 
