@@ -1,4 +1,4 @@
-let n = 8, p = 1, all = [], list = [], cats = {};
+let n = 12, p = 1, all = [], list = [], cats = {};
 let qc = prm.get("c") || "";
 let qq = (prm.get("q") || "").trim().toLowerCase();
 
