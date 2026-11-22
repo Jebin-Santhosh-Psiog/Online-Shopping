@@ -271,50 +271,59 @@ function ilog(t, bad) {
   $("#ilog").scrollTop(1e6);
 }
 
-function catFor(slug) {
-  let nm = pretty(slug), k = nm.toLowerCase();
-  let c = Object.values(cats).find(x => (x.key || x.name.toLowerCase()) == k);
-  if (c) return $.Deferred().resolve(c.id);
-  return db.add("categories", { name: nm, key: k, active: true, createdAt: new Date() }).then(x => {
-    cats[x.id] = x;
-    return x.id;
-  });
+function ckey(c) {
+  return (c.key || c.name || "").toLowerCase().trim();
 }
 
-function importCat(slug, rate, have) {
+function chunks(w, n) {
+  if (!w.length) return $.Deferred().resolve(n);
+  return db.commit(w.slice(0, 400)).then(() => chunks(w.slice(400), n + Math.min(400, w.length)));
+}
+
+function importCat(slug, rate, st) {
   return $.ajax({ url: DJ + "/category/" + encodeURIComponent(slug) + "?limit=0" }).then(r => {
     let ps = (r.products || []).filter(x => String(x.title || "").trim().length >= 2);
     if (!ps.length) return { n: 0, s: 0 };
-    return catFor(slug).then(cid => {
-      let w = [], sk = 0;
-      ps.forEach(x => {
-        let t = String(x.title).trim().replace(/\s+/g, " ").slice(0, 60), k = t.toLowerCase();
-        if (have[cid + "|" + k]) { sk++; return; }
-        have[cid + "|" + k] = 1;
-        let d = {
-          catId: cid,
-          title: t,
-          key: k,
-          des: String(x.description || t).trim().slice(0, 300),
-          qty: Math.max(0, parseInt(x.stock, 10) || 0),
-          price: Math.max(1, Math.round((+x.price || 0) * rate)),
-          img: (x.images && x.images[0]) || x.thumbnail || "",
-          active: true,
-          src: "dummyjson",
-          createdAt: new Date()
-        };
-        w.push({ update: { name: docName("inventory", newId()), fields: toFields(d) }, currentDocument: { exists: false } });
+    let nm = pretty(slug), k = nm.toLowerCase(), cid = st.byKey[k], w = [], sk = 0;
+    if (!cid) {
+      cid = newId();
+      w.push({
+        update: { name: docName("categories", cid), fields: toFields({ name: nm, key: k, active: true, createdAt: new Date() }) },
+        currentDocument: { exists: false }
       });
-      return (w.length ? db.commit(w) : $.Deferred().resolve()).then(() => ({ n: w.length, s: sk }));
+    }
+    ps.forEach(x => {
+      let t = String(x.title).trim().replace(/\s+/g, " ").slice(0, 60), tk = t.toLowerCase();
+      if (st.have[k + "|" + tk]) { sk++; return; }
+      st.have[k + "|" + tk] = 1;
+      let d = {
+        catId: cid,
+        title: t,
+        key: tk,
+        des: String(x.description || t).trim().slice(0, 300),
+        qty: Math.max(0, parseInt(x.stock, 10) || 0),
+        price: Math.max(1, Math.round((+x.price || 0) * rate)),
+        img: (x.images && x.images[0]) || x.thumbnail || "",
+        active: true,
+        src: "dummyjson",
+        createdAt: new Date()
+      };
+      w.push({ update: { name: docName("inventory", newId()), fields: toFields(d) }, currentDocument: { exists: false } });
+    });
+    let n = w.length - (st.byKey[k] ? 0 : 1);
+    if (!n) return { n: 0, s: sk };
+    return chunks(w, 0).then(() => {
+      st.byKey[k] = cid;
+      return { n: n, s: sk };
     });
   });
 }
 
-function runAll(list, rate, have, tot) {
+function runAll(list, rate, st, tot) {
   if (!list.length) return $.Deferred().resolve(tot);
   let s = list[0];
   ilog("Importing " + pretty(s) + "...");
-  return importCat(s, rate, have)
+  return importCat(s, rate, st)
     .then(
       r => {
         $("#ilog div:last").text(pretty(s) + ": " + r.n + " added, " + r.s + " skipped");
@@ -327,7 +336,54 @@ function runAll(list, rate, have, tot) {
         return $.Deferred().resolve();
       }
     )
-    .then(() => runAll(list.slice(1), rate, have, tot));
+    .then(() => runAll(list.slice(1), rate, st, tot));
+}
+
+function freshState() {
+  return $.when(db.list("categories"), db.list("inventory")).then((cs, inv) => {
+    let cnt = {}, byKey = {}, have = {}, kOf = {};
+    inv.forEach(x => cnt[x.catId] = (cnt[x.catId] || 0) + 1);
+    cs.sort((x, y) => (cnt[y.id] || 0) - (cnt[x.id] || 0));
+    cs.forEach(c => {
+      kOf[c.id] = ckey(c);
+      if (!byKey[ckey(c)]) byKey[ckey(c)] = c.id;
+    });
+    inv.forEach(x => have[(kOf[x.catId] || x.catId) + "|" + (x.key || x.title.toLowerCase())] = 1);
+    return { cs: cs, inv: inv, byKey: byKey, have: have, kOf: kOf };
+  });
+}
+
+function fixDup() {
+  return freshState().then(st => {
+    let w = [], cats2 = 0, moved = 0, dupItems = 0, seen = {};
+    st.inv.forEach(x => {
+      let k = st.kOf[x.catId];
+      if (!k) return;
+      let keep = st.byKey[k], tk = k + "|" + (x.key || x.title.toLowerCase());
+      if (x.catId == keep) seen[tk] = seen[tk] || x.id;
+    });
+    st.inv.forEach(x => {
+      let k = st.kOf[x.catId];
+      if (!k) return;
+      let keep = st.byKey[k], tk = k + "|" + (x.key || x.title.toLowerCase());
+      if (x.catId == keep) return;
+      if (seen[tk]) {
+        w.push({ delete: docName("inventory", x.id) });
+        dupItems++;
+      } else {
+        seen[tk] = x.id;
+        w.push({ update: { name: docName("inventory", x.id), fields: toFields({ catId: keep }) }, updateMask: { fieldPaths: ["catId"] } });
+        moved++;
+      }
+    });
+    st.cs.forEach(c => {
+      if (st.byKey[ckey(c)] != c.id) {
+        w.push({ delete: docName("categories", c.id) });
+        cats2++;
+      }
+    });
+    return chunks(w, 0).then(() => ({ c: cats2, m: moved, d: dupItems }));
+  });
 }
 
 $("#iopen").click(function () {
@@ -354,13 +410,9 @@ $("#irun").click(function () {
   if (!sel.length) return ilog("Select at least one category", true);
   if (!(rate >= 1 && rate <= 500)) return ilog("Enter a conversion rate from 1 to 500", true);
   let b = $(this).prop("disabled", true).text("Importing...");
-  $("#iclose").prop("disabled", true);
-  db.list("inventory")
-    .then(r => {
-      let h = {};
-      r.forEach(x => h[x.catId + "|" + (x.key || x.title.toLowerCase())] = 1);
-      return runAll(sel, rate, h, { n: 0, s: 0, f: 0 });
-    })
+  $("#iclose, #ifix").prop("disabled", true);
+  freshState()
+    .then(st => runAll(sel, rate, st, { n: 0, s: 0, f: 0 }))
     .then(t => {
       ilog("Done: " + t.n + " products added, " + t.s + " skipped" + (t.f ? ", " + t.f + " categories failed" : "") + ".");
       return loadCats();
@@ -369,7 +421,28 @@ $("#irun").click(function () {
     .fail(e => ilog(errText(e), true))
     .always(() => {
       b.prop("disabled", false).text("Import selected");
-      $("#iclose").prop("disabled", false);
+      $("#iclose, #ifix").prop("disabled", false);
+    });
+});
+
+$("#ifix").click(function () {
+  let b = $(this);
+  ask("Merge duplicate categories? Products move into one category, duplicate products are removed and the extra categories are deleted.")
+    .then(() => {
+      b.prop("disabled", true).text("Fixing...");
+      $("#irun, #iclose").prop("disabled", true);
+      $("#ilog").html("");
+      return fixDup();
+    })
+    .then(r => {
+      ilog(r.c ? "Fixed: " + r.c + " duplicate categories removed, " + r.m + " products moved, " + r.d + " duplicate products removed." : "No duplicate categories found.");
+      return loadCats();
+    })
+    .then(() => { p = 1; load(); })
+    .fail(e => ilog(errText(e), true))
+    .always(() => {
+      b.prop("disabled", false).text("Fix duplicate categories");
+      $("#irun, #iclose").prop("disabled", false);
     });
 });
 
