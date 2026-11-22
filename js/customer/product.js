@@ -5,7 +5,7 @@ function none() {
 }
 
 function show(c) {
-  document.title = x.title + " | ShopNest";
+  document.title = x.title + " | PsiogKart";
   $("#crumb").html(`<a href="shop.html">All</a> &rsaquo; <a href="shop.html?c=${x.catId}">${esc(c.name)}</a> &rsaquo; ${esc(x.title)}`);
   let m = Math.min(x.qty, 10), o = "";
   for (let i = 1; i <= m; i++) o += `<option>${i}</option>`;

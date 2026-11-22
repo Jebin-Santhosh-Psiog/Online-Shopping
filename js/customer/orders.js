@@ -6,7 +6,7 @@ function ord(o) {
       <div class="ohead">
         <div><small>ORDER PLACED</small><b>${o.createdAt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</b></div>
         <div><small>TOTAL</small><b>${rupee(o.total)}</b></div>
-        <div><small>PAYMENT</small><b>${o.payType == "credit" ? "ShopNest Credit" : "Cash on Delivery"}</b></div>
+        <div><small>PAYMENT</small><b>${o.payType == "credit" ? "PsiogKart Credit" : "Cash on Delivery"}</b></div>
         <div class="oid"><small>ORDER # ${esc(o.id)}</small><a href="bill.html?id=${o.id}">View bill</a></div>
       </div>
       <div class="obody">
@@ -40,8 +40,8 @@ loadCats();
 db.get("customers", uid).then(c => {
   let l = c.creditLimit || 0, u = c.creditUsed || 0;
   $("#credit").html(l
-    ? `ShopNest Credit: used <b>${rupee(u)}</b> of <b>${rupee(l)}</b>, available <b>${rupee(r2(l - u))}</b>`
-    : "ShopNest Credit is not enabled for your account. Pay by Cash on Delivery.");
+    ? `PsiogKart Credit: used <b>${rupee(u)}</b> of <b>${rupee(l)}</b>, available <b>${rupee(r2(l - u))}</b>`
+    : "PsiogKart Credit is not enabled for your account. Pay by Cash on Delivery.");
 });
 
 db.query({

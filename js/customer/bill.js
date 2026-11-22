@@ -1,11 +1,11 @@
 let id = prm.get("id");
 
 function bill(o) {
-  document.title = "Bill " + o.id + " | ShopNest";
+  document.title = "Bill " + o.id + " | PsiogKart";
   if (Date.now() - o.createdAt < 120000) $("#done").show();
   $("#bill").html(`
     <div class="bhead">
-      <div><div class="blogo">Shop<span>Nest</span></div><small>Tax Invoice / Bill of Supply</small></div>
+      <div><div class="blogo">Psiog<span>Kart</span></div><small>Tax Invoice / Bill of Supply</small></div>
       <div class="bmeta">
         <div><b>Bill No:</b> ${esc(o.id)}</div>
         <div><b>Date:</b> ${o.createdAt.toLocaleString("en-IN")}</div>
@@ -21,7 +21,7 @@ function bill(o) {
       </div>
       <div>
         <b>Payment</b>
-        <div>${o.payType == "credit" ? "ShopNest Credit" : "Cash on Delivery"}</div>
+        <div>${o.payType == "credit" ? "PsiogKart Credit" : "Cash on Delivery"}</div>
       </div>
     </div>
     <table>
@@ -44,7 +44,7 @@ function bill(o) {
       <div class="srow"><span>Delivery</span><span>FREE</span></div>
       <div class="srow tot"><span>Grand total</span><span>${rupee(o.total)}</span></div>
     </div>
-    <p class="bnote">${o.payType == "credit" ? rupee(o.total) + " has been charged to your ShopNest Credit." : "Please pay " + rupee(o.total) + " in cash at the time of delivery."}</p>`);
+    <p class="bnote">${o.payType == "credit" ? rupee(o.total) + " has been charged to your PsiogKart Credit." : "Please pay " + rupee(o.total) + " in cash at the time of delivery."}</p>`);
 }
 
 $("#print").click(() => window.print());
