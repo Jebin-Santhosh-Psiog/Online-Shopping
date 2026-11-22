@@ -35,7 +35,7 @@ function line(x) {
 function render() {
   count(items);
   if (!lines.length) {
-    $("#lines").html(`<div class="empty">Your ShopNest cart is empty.<br><a href="shop.html" class="btn y">Continue shopping</a></div>`);
+    $("#lines").html(`<div class="empty">Your PsiogKart cart is empty.<br><a href="shop.html" class="btn y">Continue shopping</a></div>`);
     $("#sum").hide();
     return;
   }

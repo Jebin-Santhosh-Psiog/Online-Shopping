@@ -7,10 +7,10 @@ const prm = new URLSearchParams(location.search);
 function header() {
   $("body").prepend(`
     <header class="top">
-      <a href="shop.html" class="brand">Shop<span>Nest</span></a>
+      <a href="shop.html" class="brand">Psiog<span>Kart</span></a>
       <form class="search" id="sform" action="shop.html">
         <select id="cat" name="c"><option value="">All</option></select>
-        <input id="q" name="q" placeholder="Search ShopNest">
+        <input id="q" name="q" placeholder="Search PsiogKart">
         <button>&#128269;</button>
       </form>
       <div class="acc"><small>Hello, ${esc(localStorage.getItem("name") || "Customer")}</small><b><a href="#" onclick="logout()">Sign out</a></b></div>

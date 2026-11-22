@@ -81,7 +81,7 @@ function adminNav(a) {
   let pages = ["dashboard", "categories", "inventory", "customers", "coupons", "reports"];
   $("body").prepend(`
     <nav>
-      <div class="logo">ShopAdmin</div>
+      <div class="logo">PsiogKart Admin</div>
       <div>
         ${pages.map(x => `<a href="${x}.html" class="${x == a ? "active" : ""}">${x[0].toUpperCase() + x.slice(1)}</a>`).join("")}
         <a href="#" onclick="logout()">Logout</a>

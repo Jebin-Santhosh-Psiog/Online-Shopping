@@ -1,6 +1,6 @@
-# ShopNest - Online Shopping
+# PsiogKart - Online Shopping
 
-An Amazon-style online shopping web app with a customer store and an admin panel.
+PsiogKart is an online shopping web app with a customer store and an admin panel.
 
 **Live site:** https://jebin-santhosh-psiog.github.io/Online-Shopping/
 
@@ -12,12 +12,12 @@ Built with **HTML, CSS, JavaScript and jQuery (Ajax)** on the client, and **Fire
 
 ### Customer
 - Sign up, sign in and reset password, with form validations
-- Amazon-style store: header search bar, category bar, product grid with pagination
+- Store front with a header search bar, category bar and product grid with pagination
 - Search by keywords, browse by category, sort by price or newest
 - Product page with quantity selector, Add to Cart, Buy Now and related items
 - Cart saved in the database: change quantity, remove items, live totals
 - Discount coupons (percentage or flat, minimum order, expiry)
-- Checkout with delivery address and payment by **Cash on Delivery** or **ShopNest Credit** (within the credit limit set by admin)
+- Checkout with delivery address and payment by **Cash on Delivery** or **PsiogKart Credit** (within the credit limit set by admin)
 - Bill page after every order, printable or saved as PDF
 - Order history with credit summary
 
@@ -25,6 +25,8 @@ Built with **HTML, CSS, JavaScript and jQuery (Ajax)** on the client, and **Fire
 - Dashboard with live counts: products, low stock, customers, credit outstanding, orders and sales this month
 - **Categories:** create, read with pagination, update, activate/deactivate, delete with Yes/No confirmation
 - **Inventory:** create item (category, title, description, qty, price, image), read all / by category / single item, update all fields except Id, activate/deactivate, delete with confirmation
+- **Product images:** upload from the computer (resized in the browser and stored in Firestore) or paste an image link
+- **Import sample products:** fetch products with images from the free DummyJSON API and save them into Firestore in one batch per category
 - **Customers:** set, edit and reset credit limit (max 1000, default 0)
 - **Coupons:** create, edit, activate/deactivate, delete
 - **Reports** (with CSV export and print):

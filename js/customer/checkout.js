@@ -38,7 +38,7 @@ function render() {
     <label class="pay"><input type="radio" name="pay" value="cash"> Cash on Delivery</label>
     <label class="pay ${a >= t ? "" : "off"}">
       <input type="radio" name="pay" value="credit" ${a >= t ? "" : "disabled"}>
-      ShopNest Credit <small>(available ${rupee(a)} of ${rupee(cust.creditLimit || 0)})</small>
+      PsiogKart Credit <small>(available ${rupee(a)} of ${rupee(cust.creditLimit || 0)})</small>
       ${a >= t ? "" : `<small class="err">Not enough credit for this order</small>`}
     </label>`);
 
